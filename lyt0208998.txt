@@ -1,0 +1,56 @@
+SELECT 
+   refresh_date AS Day, 
+   term AS Top_Term, 
+   rank 
+FROM `bigquery-public-data.google_trends.top_terms` 
+WHERE 
+   rank = 1 
+   AND refresh_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH) 
+GROUP BY Day, Top_Term, rank 
+ORDER BY Day DESC;
+SELECT 
+   refresh_date AS Day, 
+   term AS Top_Term, 
+   rank 
+FROM `bigquery-public-data.google_trends.top_terms` 
+WHERE 
+   rank <= 3 
+   AND refresh_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH) 
+GROUP BY Day, Top_Term, rank 
+ORDER BY Day DESC;
+SELECT 
+   refresh_date AS Day, 
+   term AS Top_Term, 
+   rank 
+FROM `bigquery-public-data.google_trends.top_terms` 
+WHERE 
+   rank <= 3 
+   AND refresh_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH) 
+   AND region = 'UK' 
+GROUP BY Day, Top_Term, rank 
+ORDER BY Day DESC;
+SELECT 
+   t.refresh_date AS Day, 
+   t.term AS Top_Term, 
+   t.rank, 
+   c.category AS Term_Category 
+FROM `bigquery-public-data.google_trends.top_terms` AS t
+JOIN `bigquery-public-data.google_trends.term_categories` AS c
+ON t.term = c.term 
+WHERE 
+   t.rank <= 3 
+   AND t.refresh_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH) 
+   AND t.region = 'UK' 
+GROUP BY Day, Top_Term, t.rank, Term_Category 
+ORDER BY Day DESC;
+SELECT 
+   EXTRACT(WEEK FROM refresh_date) AS Week_Number, 
+   ARRAY_AGG(DISTINCT term) AS Weekly_Terms, 
+   COUNT(*) AS Term_Count 
+FROM `bigquery-public-data.google_trends.top_terms` 
+WHERE 
+   rank <= 3 
+   AND refresh_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH) 
+   AND region = 'UK' 
+GROUP BY Week_Number 
+ORDER BY Week_Number DESC;
